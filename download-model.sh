@@ -1,0 +1,1 @@
+wget https://ai-cv-1255598927.cos.ap-beijing.myqcloud.com/models/u2net-salient-detection.pt -O ./pytorch_model.pt

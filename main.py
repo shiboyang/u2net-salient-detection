@@ -1,11 +1,9 @@
-import math
+from dataclasses import dataclass
 
 import cv2
 import numpy as np
 
 from model.salient_model import SalientDetection
-import torch
-from dataclasses import dataclass
 
 
 @dataclass
@@ -39,56 +37,56 @@ def order_points(pts):
     return rect
 
 
-def add_small_rotation(M, image_width, image_height, angle_degrees=-0.5):
-    """
-    给变换矩阵添加小角度旋转
-
-    参数:
-        M: 原始变换矩阵 (3x3)
-        angle_degrees: 旋转角度(负数表示逆时针), 默认-0.5度
-
-    返回:
-        添加旋转后的变换矩阵
-    """
-    # 将角度转换为弧度
-    angle_radians = angle_degrees * np.pi / 180.0
-
-    # 创建旋转矩阵
-    cos_theta = math.cos(angle_radians)
-    sin_theta = math.sin(angle_radians)
-
-    rotation_matrix = np.array([
-        [cos_theta, -sin_theta, 0],
-        [sin_theta, cos_theta, 0],
-        [0, 0, 1]
-    ], dtype=np.float32)
-
-    # 旋转通常应围绕图像中心进行
-    height, width = image_height, image_width  # 需要替换为实际图像尺寸
-    center_x, center_y = width / 2, height / 2
-
-    # 创建以图像中心为原点的旋转矩阵
-    T_to_center = np.array([
-        [1, 0, -center_x],
-        [0, 1, -center_y],
-        [0, 0, 1]
-    ], dtype=np.float32)
-
-    T_from_center = np.array([
-        [1, 0, center_x],
-        [0, 1, center_y],
-        [0, 0, 1]
-    ], dtype=np.float32)
-
-    # 完整变换: 先平移到原点，然后旋转，再平移回来
-    R_around_center = T_from_center @ rotation_matrix @ T_to_center
-
-    # 将旋转与原始变换组合
-    # 注意：矩阵乘法顺序为后应用的变换在左边
-    result_matrix = R_around_center @ M
-
-    return result_matrix
-
+# def add_small_rotation(M, image_width, image_height, angle_degrees=-0.5):
+#     """
+#     给变换矩阵添加小角度旋转
+#
+#     参数:
+#         M: 原始变换矩阵 (3x3)
+#         angle_degrees: 旋转角度(负数表示逆时针), 默认-0.5度
+#
+#     返回:
+#         添加旋转后的变换矩阵
+#     """
+#     # 将角度转换为弧度
+#     angle_radians = angle_degrees * np.pi / 180.0
+#
+#     # 创建旋转矩阵
+#     cos_theta = math.cos(angle_radians)
+#     sin_theta = math.sin(angle_radians)
+#
+#     rotation_matrix = np.array([
+#         [cos_theta, -sin_theta, 0],
+#         [sin_theta, cos_theta, 0],
+#         [0, 0, 1]
+#     ], dtype=np.float32)
+#
+#     # 旋转通常应围绕图像中心进行
+#     height, width = image_height, image_width  # 需要替换为实际图像尺寸
+#     center_x, center_y = width / 2, height / 2
+#
+#     # 创建以图像中心为原点的旋转矩阵
+#     T_to_center = np.array([
+#         [1, 0, -center_x],
+#         [0, 1, -center_y],
+#         [0, 0, 1]
+#     ], dtype=np.float32)
+#
+#     T_from_center = np.array([
+#         [1, 0, center_x],
+#         [0, 1, center_y],
+#         [0, 0, 1]
+#     ], dtype=np.float32)
+#
+#     # 完整变换: 先平移到原点，然后旋转，再平移回来
+#     R_around_center = T_from_center @ rotation_matrix @ T_to_center
+#
+#     # 将旋转与原始变换组合
+#     # 注意：矩阵乘法顺序为后应用的变换在左边
+#     result_matrix = R_around_center @ M
+#
+#     return result_matrix
+#
 
 def is_circular(contour, threshold=0.9):
     """
@@ -121,7 +119,7 @@ def is_circular(contour, threshold=0.9):
 
 def main():
     model = SalientDetection("pytorch_model.pt")
-    img = cv2.imread("data/_DSC0498.JPG")
+    img = cv2.imread("data/_DSC0495.JPG")
     img = cv2.resize(img, None, fx=0.5, fy=0.5)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_h, img_w = img.shape[:2]
